@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import Person from './Person/Person';
+import UserInput from './UserInput/UserInput';
+import UserOutput from './UserOutput/UserOutput';
 
 class App extends Component {
   state = {
@@ -9,7 +11,8 @@ class App extends Component {
       { name: 'Manu', age: 29 },
       { name: 'Stephanie', age: 26 }
     ],
-    otherState: 'some other value'
+    otherState: 'some other value',
+    username: 'Daniel'
   };
 
   switchNameHandler = (newName) => {
@@ -34,6 +37,12 @@ class App extends Component {
     });
   }
 
+  usernameChangeHandler = event => {
+    this.setState({
+      username: event.target.value
+    })
+  }
+
   render() {
     const style = {
       backgroundColor: 'white',
@@ -42,6 +51,15 @@ class App extends Component {
       padding: '8px',
       cursor: 'pointer'
     };
+
+    const card = {
+      width: '40%',
+      margin: '25px auto',
+      border: '1px solid #eee',
+      boxShadow: '0 2px 3px #ccc',
+      padding: '15px',
+      textAlign: 'left'
+    }
 
     return (
       <div className="App">
@@ -66,6 +84,15 @@ class App extends Component {
           name={this.state.persons[2].name}
           age={this.state.persons[2].age}
         />
+        <div style={card}>
+          <UserInput 
+            inputValue={this.state.username}
+            changed={this.usernameChangeHandler}
+          />
+          <UserOutput 
+            username={this.state.username}
+          />
+        </div>
       </div>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
