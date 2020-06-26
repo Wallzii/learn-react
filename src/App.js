@@ -7,40 +7,55 @@ import UserOutput from './UserOutput/UserOutput';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Max', age: 28 },
-      { name: 'Manu', age: 29 },
-      { name: 'Stephanie', age: 26 }
+      { id: '001', name: 'Max', age: 28 },
+      { id: '002', name: 'Manu', age: 29 },
+      { id: '003', name: 'Stephanie', age: 26 }
     ],
     otherState: 'some other value',
-    username: 'Daniel'
+    username: 'Daniel',
+    showPersons: false
   };
 
-  switchNameHandler = (newName) => {
-    // console.log('Was clicked!');
-    // DON'T DO THIS: this.state.persons[0].name = 'Maximilian';
-    this.setState({
-      persons: [
-        { name: newName, age: 28 },
-        { name: 'Manu', age: 29 },
-        { name: 'Stephanie', age: 27 }
-      ]
-    });
+  deletePersonHandler = (index) => {
+    // const persons = this.state.persons.slice();
+    const persons = [...this.state.persons]
+    persons.splice(index, 1);
+    this.setState({persons: persons});
   }
 
-  nameChangedHandler = event => {
-    this.setState({
-      persons: [
-        { name: 'Max', age: 28 },
-        { name: event.target.value, age: 29 },
-        { name: 'Stephanie', age: 26 }
-      ]
+  nameChangedHandler = (event, id) => {
+    // Get index of matching person:
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
     });
+
+    // Retrieve immutable person state with index:
+    const person = { 
+      ...this.state.persons[personIndex]
+    }
+
+    // Change the name of that person:
+    person.name = event.target.value;
+
+    // Get immutable object of all persons:
+    const persons = [...this.state.persons];
+
+    // Update specific person within that new object:
+    persons[personIndex] = person;
+
+    // Apply new object as new state:
+    this.setState( {persons: persons} );
   }
 
   usernameChangeHandler = event => {
     this.setState({
       username: event.target.value
     })
+  }
+
+  togglePersonsHandler = () => {
+    const doesShow = this.state.showPersons;
+    this.setState({showPersons: !doesShow});
   }
 
   render() {
@@ -61,29 +76,33 @@ class App extends Component {
       textAlign: 'left'
     }
 
+    let persons = null;
+
+    if (this.state.showPersons) {
+      persons = (
+        <div>
+          {this.state.persons.map((person, index) => {
+            return <Person 
+              click={() => this.deletePersonHandler(index)}
+              name={person.name}
+              age={person.age}
+              key={person.id}
+              changed={(e) => this.nameChangedHandler(e, person.id)} />
+          })}
+        </div> 
+      )
+    }
+
     return (
       <div className="App">
         <h1>Hi, I'm a React App</h1>
         <p>This is really working!</p>
         <button 
           style={style}
-          onClick={() => this.switchNameHandler('Maximillion!!')}>Switch Name</button>
-        <Person
-          name={this.state.persons[0].name}
-          age={this.state.persons[0].age}
-        />
-        <Person
-          name={this.state.persons[1].name}
-          age={this.state.persons[1].age}
-          click={this.switchNameHandler.bind(this, 'Max!')}
-          changed={this.nameChangedHandler}
-        >
-          My Hobbies: Racing
-        </Person>
-        <Person
-          name={this.state.persons[2].name}
-          age={this.state.persons[2].age}
-        />
+          onClick={this.togglePersonsHandler}>Toggle Persons</button>
+
+        {persons}
+
         <div style={card}>
           <UserInput 
             inputValue={this.state.username}
